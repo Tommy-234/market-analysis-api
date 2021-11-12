@@ -4,7 +4,7 @@ import {
   PushSubscription as WebPushSubscription
 } from 'web-push';
 
-export class NotificationManager {
+export class PushManager {
   constructor(
     mailTo: string,
     vapidPublic: string,
