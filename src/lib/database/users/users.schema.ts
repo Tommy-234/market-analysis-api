@@ -2,7 +2,8 @@ import { Schema } from 'mongoose';
 import { Notification, NotificationSchema} from '../notifications';
 
 export interface User {
-  userName: String;
+  _id: String;
+  username: String;
   password: String;
   email: String;
   apiKeys?: {
@@ -17,7 +18,7 @@ export interface User {
   }>;
 };
 export const UserSchema = new Schema<User>({
-  userName: { type: String, required: true },
+  username: { type: String, required: true },
   password: { type: String, required: true },
   email: { type: String, required: true },
   apiKeys: {

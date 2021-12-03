@@ -4,6 +4,7 @@ import { connect } from 'mongoose';
 import { BinanceAnalysis } from '@tommy_234/live-data';
 import { PushManager } from '../lib/push-notifications';
 import AppController from './controllers';
+import { Redirects } from './redirect';
 
 const PORT = 3001;
 const MONGO_URL = `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@localhost:27017/MarketAnalysis?authSource=admin&readPreference=primary&ssl=false`;
@@ -34,6 +35,7 @@ export class App {
   setupServer = () => {
     const server = express();
     server.use(bodyParser.json());
+    server.use(Redirects);
     server.use( (req, _, next) => {
       req.custom = {
         pushManager: this.pushManager,
@@ -41,7 +43,7 @@ export class App {
       }
       next();
     })
-    server.use(AppController);
+    server.use('/api', AppController);
     server.listen(PORT, () => {
       return console.log(`server is listening on port: ${PORT}`);
     });

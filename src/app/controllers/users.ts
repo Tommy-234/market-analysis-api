@@ -1,6 +1,7 @@
 import { Router } from 'express';
+import { first, isEmpty } from 'lodash';
 import { body, validationResult } from 'express-validator';
-import { User, UserService } from '../../lib/database'
+import { User, UserService } from '../../lib/database';
 
 class UserController {
   userService: UserService;
@@ -26,7 +27,7 @@ class UserController {
     );
     router.put(
       '/:id',
-      body('userName').isString(),
+      body('username').isString(),
       body('password').isString(),
       body('email').isEmail(),
       async (req, res) => {
@@ -45,7 +46,7 @@ class UserController {
     );   
     router.post(
       '/',
-      body('userName').isString(),
+      body('username').isString(),
       body('password').isString(),
       body('email').isEmail(),
       async (req, res) => {
@@ -53,9 +54,27 @@ class UserController {
         if (!errors.isEmpty()) {
           return res.status(400).json({ errors: errors.array() });
         }
+        
+        return this.userService.create(req.body as User)
+          .then( newUser => res.status(201).json(newUser))
+          .catch( error => res.status(400).json({ error: "Duplicate User" }));
+      }
+    );
+    router.post(
+      '/login',
+      body('username').isString(),
+      body('password').isString(),
+      async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          return res.status(400).json({ errors: errors.array() });
+        }
+        const user = first(await this.userService.find({ username: req.body.username }));
+        if (isEmpty(user) || user.password !== req.body.password) {
+          return res.status(400).json({ error: "Invalid User" });
+        }
 
-        const newUser = await this.userService.create(req.body as User);
-        return res.status(201).json(newUser);
+        return res.status(200).json({ id: user._id });
       }
     );
     this.router = router;
