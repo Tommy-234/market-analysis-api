@@ -56,7 +56,7 @@ class UserController {
         }
         
         return this.userService.create(req.body as User)
-          .then( newUser => res.status(201).json(newUser))
+          .then( newUser => res.status(201).json({ id: newUser._id }))
           .catch( error => res.status(400).json({ error: "Duplicate User" }));
       }
     );
